@@ -1,0 +1,5 @@
+pyrealsense2
+fastapi
+uvicorn
+numpy
+websockets 

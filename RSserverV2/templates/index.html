@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RealSense 서버</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">Intel RealSense 카메라 서버</h1>
+            <p class="text-gray-600">깊이 인식 카메라를 통한 3D 이미지 처리 시스템</p>
+        </header>
+
+        <!-- 상태 모니터링 섹션 -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">시스템 상태</h2>
+            <div id="statusPanel" class="grid grid-cols-2 gap-4">
+                <div class="p-4 bg-gray-50 rounded-lg">
+                    <h3 class="font-semibold text-gray-700">카메라 서비스</h3>
+                    <p id="cameraStatus" class="mt-2">확인 중...</p>
+                    <button id="restartButton" 
+                            class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
+                        파이프라인 재시작
+                    </button>
+                </div>
+                <div class="p-4 bg-gray-50 rounded-lg">
+                    <h3 class="font-semibold text-gray-700">파이프라인</h3>
+                    <p id="pipelineStatus" class="mt-2">확인 중...</p>
+                </div>
+                <div class="p-4 bg-gray-50 rounded-lg">
+                    <h3 class="font-semibold text-gray-700">프레임 정보</h3>
+                    <p id="frameInfo" class="mt-2">확인 중...</p>
+                </div>
+                <div class="p-4 bg-gray-50 rounded-lg">
+                    <h3 class="font-semibold text-gray-700">에러 상태</h3>
+                    <p id="errorInfo" class="mt-2">확인 중...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 설명 섹션 -->
+        <div class="bg-white rounded-lg shadow-lg p-8 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <h2 class="text-2xl font-semibold mb-4">스테레오 비전 시스템</h2>
+                    <p class="text-gray-600 mb-4">
+                        Intel RealSense는 두 개의 카메라를 사용하여 인간의 양안시와 유사한 방식으로 깊이 정보를 계산합니다.
+                        좌우 카메라의 시차(視差)를 이용해 물체까지의 거리를 측정하고, 이를 통해 3차원 공간 정보를 획득합니다.
+                    </p>
+                    <p class="text-gray-600">
+                        획득한 깊이 정보는 포인트 클라우드로 변환되어 3D 모델링, 객체 인식, 거리 측정 등 다양한 응용이 가능합니다.
+                    </p>
+                </div>
+                <div class="flex justify-center">
+                    <img src="{{ url_for('static', path='/images/realsense-diagram.svg') }}" 
+                         alt="RealSense 스테레오 비전" 
+                         class="max-w-full h-auto rounded-lg shadow-md">
+                </div>
+            </div>
+        </div>
+
+        <!-- 링크 섹션 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- 카메라 스트림 링크 -->
+            <a href="http://fouronesystem.asuscomm.com:19000/camera/color" class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
+                <h3 class="text-xl font-semibold text-blue-600 mb-2">Color Image</h3>
+                <p class="text-gray-600">RGB 카메라 스트림 보기</p>
+            </a>
+            <a href="http://fouronesystem.asuscomm.com:19000/camera/depth" class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
+                <h3 class="text-xl font-semibold text-blue-600 mb-2">Depth Image</h3>
+                <p class="text-gray-600">깊이 카메라 스트림 보기</p>
+            </a>
+            
+            <!-- 데이터 및 문서 링크 -->
+            <a href="http://fouronesystem.asuscomm.com:19000/pointcloud/data" class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
+                <h3 class="text-xl font-semibold text-blue-600 mb-2">Point Cloud</h3>
+                <p class="text-gray-600">실시간 포인트 클라우드 데이터</p>
+            </a>
+            <a href="http://fouronesystem.asuscomm.com:19000/docs" class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
+                <h3 class="text-xl font-semibold text-blue-600 mb-2">API Documentation</h3>
+                <p class="text-gray-600">Swagger API 문서 및 개발 가이드</p>
+            </a>
+        </div>
+
+        <!-- 푸터 -->
+        <footer class="mt-12 text-center text-gray-500">
+            <p>Intel® RealSense™ Technology</p>
+        </footer>
+    </div>
+
+    <script>
+        // ASUS DDNS 주소 설정
+        const ASUS_DDNS_URL = 'http://fouronesystem.asuscomm.com:19000';
+
+        // 상태 텍스트 변환 함수
+        function getStatusText(status) {
+            switch(status) {
+                case 'running':
+                    return '실행 중';
+                case 'starting':
+                    return '시작 중';
+                case 'error':
+                    return '오류';
+                case 'stopped':
+                    return '중지됨';
+                default:
+                    return '알 수 없음';
+            }
+        }
+
+        // 알림 표시 함수
+        function showNotification(title, message, type, logs = null) {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg ${
+                type === 'success' ? 'bg-green-100 border-green-500' : 'bg-red-100 border-red-500'
+            } border text-gray-800 max-w-md`;
+            
+            let content = `
+                <div class="font-bold mb-1">${title}</div>
+                <div class="text-sm mb-2">${message}</div>
+            `;
+
+            // 로그가 있으면 로그 섹션 추가
+            if (logs && logs.length > 0) {
+                content += `
+                    <div class="mt-2">
+                        <div class="font-bold mb-1">상세 로그:</div>
+                        <div class="text-xs bg-white bg-opacity-50 p-2 rounded max-h-60 overflow-y-auto">
+                            ${logs.map(log => `
+                                <div class="mb-1">
+                                    <span class="text-gray-500">${log.timestamp}</span>
+                                    <span class="ml-2">${log.message}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            notification.innerHTML = content;
+            document.body.appendChild(notification);
+            
+            // 15초 후 알림 제거 (로그가 있을 경우 더 오래 표시)
+            setTimeout(() => {
+                notification.classList.add('opacity-0', 'transition-opacity');
+                setTimeout(() => notification.remove(), 300);
+            }, logs ? 15000 : 5000);
+        }
+
+        // 재시작 버튼 이벤트 핸들러
+        document.getElementById('restartButton').addEventListener('click', async () => {
+            try {
+                const button = document.getElementById('restartButton');
+                button.disabled = true;
+                button.textContent = '재시작 중...';
+                
+                const response = await fetch(`${ASUS_DDNS_URL}/api/camera/restart`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                if (result.status === 'success') {
+                    showNotification('성공', result.message, 'success', result.logs);
+                } else {
+                    showNotification('오류', result.message, 'error', result.logs);
+                    console.error('상세 에러:', result.details);
+                }
+            } catch (error) {
+                console.error('재시작 요청 실패:', error);
+                showNotification('오류', '서버 연결 실패. 네트워크 상태를 확인해주세요.', 'error');
+            } finally {
+                const button = document.getElementById('restartButton');
+                button.disabled = false;
+                button.textContent = '파이프라인 재시작';
+            }
+        });
+
+        // 상태 업데이트 함수
+        function updateStatus(status) {
+            // 카메라 서비스 상태
+            const cameraStatus = document.getElementById('cameraStatus');
+            cameraStatus.textContent = `상태: ${status.camera_service_running ? '실행 중' : '중지됨'}`;
+            cameraStatus.className = status.camera_service_running ? 'text-green-600' : 'text-red-600';
+
+            // 파이프라인 상태
+            const pipelineStatus = document.getElementById('pipelineStatus');
+            const ps = status.pipeline_status;
+            
+            // 상태에 따른 색상 설정
+            let statusColor = 'text-gray-600';
+            switch(ps.status) {
+                case 'running':
+                    statusColor = 'text-green-600';
+                    break;
+                case 'starting':
+                    statusColor = 'text-yellow-600';
+                    break;
+                case 'error':
+                    statusColor = 'text-red-600';
+                    break;
+                case 'stopped':
+                    statusColor = 'text-gray-600';
+                    break;
+            }
+            
+            pipelineStatus.innerHTML = `
+                <div class="${statusColor}">파이프라인: ${getStatusText(ps.status)}</div>
+                <div class="text-sm mt-1">쓰레드: ${status.thread_status === 'running' ? '실행 중 ✅' : '중지됨 ⛔'}</div>
+                <div class="text-sm">해상도: ${ps.resolution}</div>
+                <div class="text-sm">FPS: ${ps.fps_setting}</div>
+            `;
+
+            // 프레임 정보
+            const frameInfo = document.getElementById('frameInfo');
+            frameInfo.innerHTML = `
+                <div>총 프레임: ${status.frame_count}</div>
+                <div class="text-sm mt-1">마지막 프레임: ${status.last_frame_time || 'N/A'}</div>
+                <div class="text-sm">파이프라인 프레임: ${ps.total_frames}</div>
+            `;
+
+            // 에러 정보
+            const errorInfo = document.getElementById('errorInfo');
+            const hasErrors = status.error_count > 0 || ps.error_count > 0;
+            errorInfo.innerHTML = `
+                <div class="${hasErrors ? 'text-red-600' : 'text-green-600'}">
+                    카메라 에러: ${status.error_count}
+                </div>
+                <div class="text-sm mt-1">파이프라인 에러: ${ps.error_count}</div>
+                <div class="text-sm">총 에러: ${ps.total_errors}</div>
+            `;
+        }
+
+        // SSE 연결 설정
+        const eventSource = new EventSource(`${ASUS_DDNS_URL}/api/camera/status/stream`);
+        
+        eventSource.onmessage = function(event) {
+            const status = JSON.parse(event.data);
+            updateStatus(status);
+        };
+
+        eventSource.onerror = function(error) {
+            console.error('SSE Error:', error);
+            // 연결 재시도
+            setTimeout(() => {
+                eventSource.close();
+                new EventSource(`${ASUS_DDNS_URL}/api/camera/status/stream`);
+            }, 5000);
+        };
+    </script>
+</body>
+</html> 

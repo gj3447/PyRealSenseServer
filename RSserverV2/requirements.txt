@@ -1,0 +1,6 @@
+fastapi==0.104.1
+uvicorn==0.24.0
+python-dotenv==1.0.0
+numpy==1.24.3
+opencv-python==4.8.1.78
+pyrealsense2==2.54.1.5652 

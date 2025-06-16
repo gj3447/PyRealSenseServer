@@ -1,0 +1,47 @@
+{
+    "camera_info": {
+        "model": "Intel® RealSense™ D455",
+        "color": {
+            "width": 640,
+            "height": 480,
+            "fps": 15,
+            "format": "BGR8",
+            "description": "컬러 스트림 설정"
+        },
+        "depth": {
+            "width": 640,
+            "height": 480,
+            "fps": 15,
+            "format": "Z16",
+            "max_distance": 10.0,
+            "description": "깊이 스트림 설정",
+            "accuracy": "±2mm at 2m"
+        },
+        "fov": {
+            "horizontal": 87,
+            "vertical": 58,
+            "description": "시야각 (도)"
+        },
+        "endpoints": {
+            "color": {
+                "format": "jpeg",
+                "quality": 80,
+                "resolutions": [
+                    {"width": 640, "height": 480, "fps": 15},
+                    {"width": 640, "height": 480, "fps": 30},
+                    {"width": 848, "height": 480, "fps": 15},
+                    {"width": 848, "height": 480, "fps": 30}
+                ]
+            },
+            "depth": {
+                "format": "png",
+                "resolutions": [
+                    {"width": 640, "height": 480, "fps": 15},
+                    {"width": 640, "height": 480, "fps": 30},
+                    {"width": 848, "height": 480, "fps": 15},
+                    {"width": 848, "height": 480, "fps": 30}
+                ]
+            }
+        }
+    }
+} 

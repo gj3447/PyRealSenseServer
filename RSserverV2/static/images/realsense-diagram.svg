@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="600" height="300" version="1.1" viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg">
+ <rect x="50" y="50" width="500" height="200" fill="#f0f9ff" stroke="#3b82f6" stroke-width="2"/>
+ <g transform="translate(100,80)">
+  <!-- Left Camera -->
+  <rect x="0" y="0" width="80" height="60" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <text x="40" y="35" text-anchor="middle" fill="#1e40af" font-family="Arial" font-size="12">Left Camera</text>
+  <!-- Right Camera -->
+  <rect x="320" y="0" width="80" height="60" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <text x="360" y="35" text-anchor="middle" fill="#1e40af" font-family="Arial" font-size="12">Right Camera</text>
+  <!-- Center Processing -->
+  <rect x="160" y="80" width="80" height="60" fill="#bfdbfe" stroke="#2563eb" stroke-width="2"/>
+  <text x="200" y="105" text-anchor="middle" fill="#1e40af" font-family="Arial" font-size="12">Depth</text>
+  <text x="200" y="120" text-anchor="middle" fill="#1e40af" font-family="Arial" font-size="12">Processing</text>
+  <!-- Arrows -->
+  <line x1="80" y1="30" x2="160" y2="110" stroke="#3b82f6" stroke-width="2"/>
+  <line x1="320" y1="30" x2="240" y2="110" stroke="#3b82f6" stroke-width="2"/>
+ </g>
+</svg> 

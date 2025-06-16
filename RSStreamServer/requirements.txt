@@ -1,0 +1,5 @@
+fastapi==0.109.0
+uvicorn==0.27.0
+opencv-python==4.9.0.80
+numpy==1.26.3
+pyrealsense2==2.54.2.5684 
