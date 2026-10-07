@@ -205,6 +205,12 @@ python test.py
 
 이 프로젝트는 Intel RealSense 카메라를 위한 다양한 스트리밍 서버 구현체들을 제공합니다. 각 버전은 서로 다른 사용 사례와 요구사항을 위해 개발되었습니다.
 
-## 📄 라이선스
+## License
 
-이 프로젝트는 교육 및 연구 목적으로 개발되었습니다. 
+이 프로젝트는 교육 및 연구 목적으로 개발되었습니다.
+
+**MetaHumotonic License 1.2** — [LICENSE](LICENSE); [scope, prior grants and third-party notices](LICENSE-NOTICE.md).
+
+지정한 하드웨어의 접근권한과 전체 관리 권한을 합의한 명세서에 따라 공유하고, **CHU의 일부가 된다**는 참여 원칙을 적용합니다. 실제 접근에는 별도 승인이 필요합니다.
+
+Source-available; not OSI-approved. Existing grants and separately licensed material remain valid.
